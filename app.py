@@ -1,9 +1,9 @@
-from typing import Text
-from requests import patch
 import torch
 import io
 from PIL import Image
 import cv2
+import argparse
+import imutils
 import numpy as np
 
 import os
@@ -20,17 +20,11 @@ conn = psycopg2.connect( #psycopg2 database adaptor for implementing python
 
 app = Flask(__name__)
 
-RESULT_FOLDER = os.path.join('static')
-app.config['RESULT_FOLDER'] = RESULT_FOLDER
-
 model = torch.hub.load( '/home/neosoft/Documents/OCR/yolov5','custom',path='/home/neosoft/Documents/OCR/best.pt',source='local') # for PIL/cv2/np inputs and
 
 def get_prediction(img_bytes):
     img = Image.open(io.BytesIO(img_bytes))
-     # batched list of images
-
-# Inference
-    results = model(img, size=640)  # includes NMS
+    results = model(img, size=640)  
     return results
 
 
@@ -47,34 +41,43 @@ def predict():
         results = get_prediction(img_bytes)
         print(type(results))
         results.save('results0.jpg')
-        # path=''
-        
-        # for file in os.listdir("runs/detect"):
-        #     path='runs/detect/{}/image0.jpg'.format(file)
-
+    
         crops = results.crop(save=True)  
-        #cv2.imshow('croped',crops[0]['im'])
+        
         crops=crops[0]['im']
-        #array1=np.array(crops)
-        #var1=array1.astype(np.uint8)
-        img=Image.fromarray(crops)
+        #ad
+        img = cv2.cvtColor(crops, cv2.COLOR_BGR2GRAY)
+        # img = cv2.threshold(img, 0, 255,
+	    # cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        
+#         cnts = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL,
+#     	cv2.CHAIN_APPROX_SIMPLE)
+#         cnts = imutils.grab_contours(cnts)
+#         chars = []
+# # loop over the contours
+#         for c in cnts:
+#              (x, y, w, h) = cv2.boundingRect(c)
+#              if w >= 35 and h >= 100:
+#                  chars.append(c)
 
+#         chars = np.vstack([chars[i] for i in range(0, len(chars))])
+#         hull = cv2.convexHull(chars)
+#         # allocate memory for the convex hull mask, draw the convex hull on
+#         # the image, and then enlarge it via a dilation
+#         mask = np.zeros(crops.shape[:2], dtype="uint8")
+#         cv2.drawContours(mask, [hull], -1, 255, -1)
+#         mask = cv2.dilate(mask, None, iterations=2)
+#         cv2.imshow("Mask", mask)
+# # take the bitwise of the opening image and the mask to reveal *just*
+# # the characters in the image
+#         img = cv2.bitwise_and(img, img, mask=mask )       
+        #ad
+        img=Image.fromarray(img)
         img.show()
         text = pytesseract.image_to_string(img)
         return render_template('results.html',path=text)   
 
-         # save as results1.jpg, results2.jpg... etc.
-        #os.rename("results0.jpg", "static/results0.jpg")
-        # results.show()
-        
-        # # 
-        # # cv2.imwrite("crop.jpg",crops)
-        # # crops.show()
-        # 
-        # # cv2.imshow('croped',array1)
-        # # print(array1)
-        #ull_filename = os.path.join(app.config['RESULT_FOLDER'], 'results0.jpg')
-        #return redirect(full_filename)
+    
     return render_template('index.html')    
 app.secret_key = 'the random string' 
 if __name__ == "__main__":
