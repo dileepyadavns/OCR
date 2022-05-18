@@ -26,7 +26,7 @@
    Called the model for number plate detection on input image and cropped image on bounding box co-orcinates
 
 # step8: Tesseract 
-   Passed the cropped image on tesseract and extracted the number plate details
+   Passed the cropped image on tesseract and extracted the number plate details and done basic image processing on cropped image
 
 # step9: checking on database
    Checking the number plate details on database and printing the output on webpage   
