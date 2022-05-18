@@ -4,6 +4,7 @@ import io
 from PIL import Image
 import cv2
 import numpy as np
+import imutils
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from itsdangerous import Signer, BadSignature, want_bytes
@@ -45,14 +46,43 @@ def predict():
     
         crops = results.crop(save=True) #cropping the image on bounding box
         crops=crops[0]['im'] #to get the image array from the array created from above step
-       
-        img = cv2.cvtColor(crops, cv2.COLOR_BGR2GRAY) #to convert image to gray
+        img = imutils.resize(crops, width=300 )
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #to convert image to gray
+        img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+        
+        img = cv2.bilateralFilter(img, 11, 17, 17) 
+        img = cv2.medianBlur(img, 3)
+        #cv2.threshold(img,127,255,cv2.THRESH_BINARY)
+        cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+        
         img=Image.fromarray(img) #to get image from array
         img.show()#to display image
         text = pytesseract.image_to_string(img)#to get the charcters from number plate
-        return render_template('results.html',path=text)#to redirect to results html page   
+        
+        #for removing empty spaces
+        text1='' 
+        for i in text:
+            if i==" ":
+                continue
+            else:
+                text1+=i
+        text2=''        
+        for i in text1:
+            if i.lower()!=i or i.isdigit():
+                text2+=i        
+        
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        s = "SELECT * FROM cars where vehicleNo =%s"
 
-    
+        cur.execute(s, (text2,))
+        
+        res = cur.fetchall()
+        if len(res)>=1:
+            return render_template('results.html',path=text2,msg="Car has granted permission")#to redirect to results html page   
+
+        else:
+            return render_template('results.html',path=text2,msg="Car has not granted permission")#to redirect to results html page   
+
     return render_template('index.html')    
 app.secret_key = 'the random string' 
 if __name__ == "__main__":

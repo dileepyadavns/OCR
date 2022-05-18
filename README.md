@@ -1,15 +1,32 @@
-# OCR
+#                         Number Plate Authentication System
 
+# Flow Chart
 
-step1: Downloaded Images for training and validation and labelled them for training on yolo v5
+<img src="flowchart.png" >
 
-step2: will extract the number plate from the images 
+# Process 
 
-step3: later will apply OCR on the number plate to extract the text on number plate
+# step1: Getting Dataset
+   Downloaded some high quality car images with number plate and cleaned the images for clear number plate 
 
-step4: Creating table on postgreSQL and will give some number plate details
+# step2: labelling images  for  YOLOV5 format:
+   Labelled Images using LabelImg tool and got text files of each image
 
-step5: later will give random image to ocr and will predict the text and check the content whether it is present in postgreSQL if it is present then it will print on the webpage as acess granted if not present will print as acess not granted
+# step3: Training the YOLOV5
+   Trained the YOLOV5  model on dataset  and downloaded the best.pt file 
 
+# step4: Loading model on flask
+   Loaded model on the flask using torch with the trained weights file
 
-# best.pt is the weight file i got after training the yolov5 on custom data here i used this file to detect the images 
+# step5:Connecting to Database
+   Connected flask to postgreSQL using psycopg2 
+# step6: Taking Input
+   created an html page for taking input image from user for number plate extraction
+# step7: Detection for number plate
+   Called the model for number plate detection on input image and cropped image on bounding box co-orcinates
+
+# step8: Tesseract 
+   Passed the cropped image on tesseract and extracted the number plate details
+
+# step9: checking on database
+   Checking the number plate details on database and printing the output on webpage   
