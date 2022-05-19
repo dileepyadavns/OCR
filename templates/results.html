@@ -6,27 +6,64 @@
         padding: 0;
        
     }
-      .container{
-        background-image: linear-gradient(to right, #DECBA4, #3E5151);
-        height: 100vh;
+    .container{
+
+
+background-image: url("static/bg2.jpeg");
+        background-size: cover;
+        
+
+background-size: cover;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+form{
         display: flex;
         flex-direction: column;
+        align-self: center;
+        width: 400px;
+        height: 300px;
         justify-content: center;
-        align-items: center;
+        background-color: white;
+        border:solid 2px black;
+        border-radius:16px ;
+      }
+      .red{
+        color: red;
+        font-size: 20px;
+      }
+      .green{
+        color: rgb(3, 77, 3);
+        font-size: 18px;
       }
  </style>
 </head>
 <body>
 <div class="container">
-    <h1 style="color: rgb(63, 240, 18);">
-        Here is the characters which are extracted from number plate
-    </h1>
-    <br>
-    <p style="color: white; font-size: 25px;">{{path}}</p>
-    <br>
-    <p style="color:yellow; font-size: 20px;">{{msg}}</p>
+  <h1 style="font-size: 25px; margin-bottom:40px; text-align: center;">
+    Character recognition of number plate
+</h1>
+  <form>
     
+    <br>
+    <div style="text-align: center;">
+    <p style=" font-size: 20px; text-align: center;">{{path}}</p>
+  
+    </div>
+    <br>
+    <div id="result" style="text-align: center;">
+    <p id="msg" style="font-size: 20px;" class={{cls}}>{{msg}}</p>
+    <img src={{symbol}}  alt="image">
+    </div>
+  </form>
+  
 </div>
+<script>
+ 
+</script>
 </body>
 
  </html>
